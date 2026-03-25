@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVOLVE Research Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans','Helvetica Neue',sans-serif;background:#F7F5F0;color:#1A1814}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#D8D4CA;border-radius:10px}
+#app{display:flex;flex-direction:column;height:100vh}
+header{background:#1A1814;padding:0 24px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:26px;height:26px;background:#C17A3C;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;font-family:'Fraunces',serif}
+.logo-text{color:#F7F5F0;font-size:13.5px;font-weight:600}
+.hdr-right{display:flex;align-items:center;gap:16px}
+.sdot{width:8px;height:8px;border-radius:50%}
+.son{background:#2D7A4A}.soff{background:#C0392B}.schk{background:#B0AA9E}
+.stxt{font-size:10.5px;font-family:'DM Mono',monospace}
+.son-t{color:#6B9E7A}.soff-t{color:#E07070}.schk-t{color:#6A6460}
+.plabel{font-size:10px;color:#4A4540;font-family:'DM Mono',monospace;letter-spacing:.06em}
+.ptxt{font-size:11.5px;color:#C17A3C;display:flex;align-items:center;gap:6px}
+.dntxt{font-size:11.5px;color:#6B9E7A;font-weight:500}
+.hspinner{width:10px;height:10px;border:1.5px solid rgba(193,122,60,.3);border-top-color:#C17A3C;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+.body-wrap{display:flex;flex:1;overflow:hidden}
+aside{width:296px;flex-shrink:0;background:#F0EDE6;border-right:1px solid #E2DDD6;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column}
+.owarn{background:#FFF5F5;border:1.5px solid #FCA5A5;border-radius:8px;padding:10px 12px;font-size:12px;color:#B91C1C;line-height:1.6;margin-bottom:14px}
+.ftitle{font-family:'Fraunces',serif;font-size:16px;font-weight:400;margin-bottom:2px}
+.fsub{font-size:11px;color:#9E998F;margin-bottom:14px}
+.fields{display:flex;flex-direction:column;gap:11px;margin-bottom:18px}
+.lbl{font-size:10px;font-weight:600;color:#6A6460;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:4px;display:flex;align-items:center;gap:3px}
+.req{width:5px;height:5px;background:#C17A3C;border-radius:50%;flex-shrink:0}
+input.field,textarea.field{width:100%;background:#fff;border:1.5px solid #E2DDD6;border-radius:8px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:#1A1814;outline:none;resize:vertical;transition:border-color .2s,box-shadow .2s;line-height:1.5}
+input.field:focus,textarea.field:focus{border-color:#C17A3C;box-shadow:0 0 0 3px rgba(193,122,60,.12)}
+input.field::placeholder,textarea.field::placeholder{color:#B8B2A8;font-size:12px}
+.runbtn{width:100%;background:#1A1814;color:#F7F5F0;border:none;border-radius:8px;padding:14px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.runbtn:hover:not(:disabled){background:#2D2920;transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,24,20,.2)}
+.runbtn:disabled{background:#C8C3BB;cursor:not-allowed;transform:none}
+.spinner{width:13px;height:13px;border:2px solid rgba(247,245,240,.3);border-top-color:#F7F5F0;border-radius:50%;animation:spin .7s linear infinite}
+.errbox{background:#FFF5F5;border:1px solid #FCA5A5;border-radius:6px;padding:8px 10px;font-size:11.5px;color:#B91C1C;line-height:1.6;margin-top:10px}
+.div{height:1px;background:#E2DDD6;margin:16px 0}
+.phdr{font-size:10px;font-weight:600;font-family:'DM Mono',monospace;color:#C17A3C;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid #E2DDD6;padding-bottom:6px;margin-bottom:10px}
+.glbl{font-size:9px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.14em;text-transform:uppercase;margin:10px 0 4px}
+.srow{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #EDE9E2;transition:opacity .3s}
+.snum{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;margin-top:1px;transition:all .3s}
+.slbl{font-size:11px;line-height:1.3}
+.ssub{font-size:9.5px;color:#B0AA9E;margin-top:1px}
+.pbar{height:3px;background:#E2DDD6;border-radius:2px;margin-top:14px;overflow:hidden}
+.pbarfill{height:100%;background:linear-gradient(90deg,#C17A3C,#D4956E);border-radius:2px;transition:width .4s ease}
+.pinfo{font-size:10px;color:#B0AA9E;margin-top:5px;font-family:'DM Mono',monospace}
+.pdone{font-size:11px;color:#C17A3C;margin-top:8px}
+main{flex:1;overflow-y:auto;background:#F7F5F0;padding:24px 28px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;height:100%;text-align:center}
+.eicon{width:56px;height:56px;border-radius:16px;background:#EDE9E2;display:flex;align-items:center;justify-content:center;font-size:24px}
+.etitle{font-family:'Fraunces',serif;font-size:20px;font-weight:300;font-style:italic}
+.esub{font-size:13px;color:#9E998F;max-width:380px;line-height:1.8}
+.livepanel{display:none}
+.liverow{display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:12.5px;color:#C17A3C;font-weight:500}
+.ldot{width:7px;height:7px;border-radius:50%;background:#C17A3C;animation:pulse 1.4s ease-in-out infinite}
+.lcard{background:#fff;border:1.5px solid #E2DDD6;border-radius:10px;padding:14px 16px;margin-bottom:8px}
+.lclbl{font-size:10px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.lcbody{font-family:'DM Mono',monospace;font-size:11px;color:#6A6460;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.tabswrap{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.tabs{display:flex;gap:3px;padding:4px;background:#EDE9E2;border-radius:10px;flex:1}
+.tab{flex:1;padding:7px 8px;border:none;border-radius:7px;background:transparent;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:500;color:#7A7469;cursor:pointer;transition:all .2s;text-align:center}
+.tab:hover:not(.active){color:#1A1814}
+.tab.active{background:#fff;color:#1A1814;box-shadow:0 1px 4px rgba(26,24,20,.1);font-weight:600}
+.dlbtn{background:#1A1814;color:#F7F5F0;border:none;border-radius:8px;padding:8px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.dlbtn:hover:not(:disabled){background:#2D2920}
+.dlbtn:disabled{background:#C8C3BB;cursor:not-allowed}
+.outhdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.outtitle{font-family:'Fraunces',serif;font-size:21px;font-weight:400;margin-bottom:3px}
+.outsub{font-size:11.5px;color:#9E998F}
+.cpbtn{background:#F0EDE6;border:1.5px solid #E2DDD6;border-radius:6px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;color:#1A1814;transition:all .2s}
+.cpbtn:hover{background:#E8E4DC}.cpbtn.cok{background:#D4EDDA;border-color:#6B9E7A;color:#2D7A4A}
+.outbox{background:#fff;border:1.5px solid #E2DDD6;border-radius:12px;padding:28px 30px}
+.outcontent{font-family:'DM Mono',monospace;font-size:12px;line-height:1.85;color:#1A1814;white-space:pre-wrap;word-break:break-word}
+.loggp{margin-bottom:24px}
+.loggl{font-size:10px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.logst{background:#fff;border:1.5px solid #E2DDD6;border-radius:10px;padding:16px 18px;margin-bottom:8px}
+.logsth{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.logstn{width:20px;height:20px;border-radius:50%;background:#1A1814;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#F7F5F0;font-family:'DM Mono',monospace;flex-shrink:0}
+.logstb{font-family:'DM Mono',monospace;font-size:11.5px;line-height:1.85;color:#4A4540;white-space:pre-wrap}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(193,122,60,.2)}50%{box-shadow:0 0 0 7px rgba(193,122,60,.06)}}
+@keyframes pr{0%,100%{box-shadow:0 0 0 3px rgba(193,122,60,.2)}50%{box-shadow:0 0 0 7px rgba(193,122,60,.06)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">E</div>
+      <span class="logo-text">EVOLVE Research Agent</span>
+    </div>
+    <div class="hdr-right">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="sdot schk" id="sdot"></div>
+        <span class="stxt schk-t" id="stxt">Checking…</span>
+      </div>
+      <span class="dntxt" id="dntxt" style="display:none">✓ 23 steps complete</span>
+      <span class="ptxt" id="ptxt" style="display:none"><span class="hspinner"></span><span id="ppct">0%</span></span>
+      <span class="plabel">23-STEP PIPELINE</span>
+    </div>
+  </header>
+
+  <div class="body-wrap">
+    <aside id="sidebar">
+      <div class="owarn" id="owarn" style="display:none">
+        <strong>Backend offline.</strong> Check your Railway deployment.
+      </div>
+      <p class="ftitle">Brief Input</p>
+      <p class="fsub">Agent uses Brave Search + Puppeteer to research every source live.</p>
+      <div class="fields" id="fields"></div>
+      <button class="runbtn" id="runbtn" onclick="runPipeline()"><span style="font-size:14px">▶</span> Run Full Pipeline</button>
+      <div class="errbox" id="errbox" style="display:none"></div>
+      <div class="div"></div>
+      <div class="phdr">Pipeline — 23 Steps</div>
+      <div id="steps"></div>
+      <div class="pbar" id="pbar" style="display:none"><div class="pbarfill" id="pbarfill" style="width:0%"></div></div>
+      <div class="pinfo" id="pinfo" style="display:none"></div>
+      <div class="pdone" id="pdone" style="display:none">✓ Pipeline complete</div>
+    </aside>
+
+    <main id="main">
+      <div class="empty" id="emptystate">
+        <div class="eicon">📋</div>
+        <p class="etitle">Your brief lives here.</p>
+        <p class="esub">Fill the brief and hit Run. The agent opens real Reddit threads, scrapes Facebook Ad Library for every active competitor ad, reads YouTube comment sections, navigates TikTok Creative Center, and more — then applies the full EVOLVE framework.</p>
+      </div>
+      <div class="livepanel" id="livepanel">
+        <div class="liverow"><span class="ldot"></span><span id="livelbl">Starting…</span></div>
+        <div id="livecards"></div>
+      </div>
+      <div id="outpanel" style="display:none">
+        <div class="tabswrap">
+          <div class="tabs">
+            <button class="tab active" onclick="switchTab('evolve')">EVOLVE Brief</button>
+            <button class="tab" onclick="switchTab('copy')">Copywriter Brief</button>
+            <button class="tab" onclick="switchTab('log')">Research Log</button>
+          </div>
+          <button class="dlbtn" id="dlbtn" onclick="downloadBrief()">↓ Download</button>
+        </div>
+        <div id="tabevolve">
+          <div class="outhdr"><div><p class="outtitle">EVOLVE Framework Brief</p><p class="outsub" id="emeta"></p></div><button class="cpbtn" id="cpevolve" onclick="copyText('evolve')">Copy</button></div>
+          <div class="outbox"><div class="outcontent" id="evolvecontent"></div></div>
+        </div>
+        <div id="tabcopy" style="display:none">
+          <div class="outhdr"><div><p class="outtitle">Copywriter Brief</p><p class="outsub" id="cmeta"></p></div><button class="cpbtn" id="cpcopy" onclick="copyText('copy')">Copy</button></div>
+          <div class="outbox"><div class="outcontent" id="copycontent"></div></div>
+        </div>
+        <div id="tablog" style="display:none">
+          <div class="outhdr"><div><p class="outtitle">Research Log</p><p class="outsub">Every source · Every step · 23 steps total</p></div><button class="cpbtn" id="cpall" onclick="copyText('all')">Copy All</button></div>
+          <div id="logcontent"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const BACKEND = "https://research-agent-backend-production-1028.up.railway.app";
+
+const STEPS = [
+  {id:0,label:"Reddit — Surface VOC",sub:"Find subreddits & thread URLs",group:"voc"},
+  {id:1,label:"Reddit — Deep Thread Dive",sub:"Open full threads, read every comment",group:"voc"},
+  {id:2,label:"Amazon VOC",sub:"Competitor 2–3★ reviews scraped live",group:"voc"},
+  {id:3,label:"YouTube Comments",sub:"Full comment sections extracted",group:"voc"},
+  {id:4,label:"Forum & Web VOC",sub:"Niche communities & Q&A sites",group:"voc"},
+  {id:5,label:"Facebook Ad Library",sub:"Every active competitor ad scraped live",group:"intel"},
+  {id:6,label:"TikTok Creative Center",sub:"Top ads — hooks & creative patterns",group:"intel"},
+  {id:7,label:"Competitor Landing Pages",sub:"Mechanisms, claims & positioning",group:"intel"},
+  {id:8,label:"New Mechanism Research",sub:"Patents, studies, novel delivery",group:"intel"},
+  {id:9,label:"New Information Research",sub:"Recent studies & education angles",group:"intel"},
+  {id:10,label:"Market Sophistication",sub:"Stage 1–5 + Big 3 strategic response",group:"evolve"},
+  {id:11,label:"Desire Identification",sub:"Mass instinct + desire calendar",group:"evolve"},
+  {id:12,label:"Avatar Development",sub:"Core + 3 sub-avatars, 5 categories",group:"evolve"},
+  {id:13,label:"20 Angles",sub:"EVOLVE extraction from all research",group:"evolve"},
+  {id:14,label:"Score & Filter Top 5",sub:"Ruthless ranking by strength & gap",group:"evolve"},
+  {id:15,label:"Awareness Mapping",sub:"Schwartz level per angle + entry point",group:"evolve"},
+  {id:16,label:"Concepts — Angles 1–3",sub:"3 concepts each, directional hooks",group:"evolve"},
+  {id:17,label:"Concepts — Angles 4–5",sub:"3 concepts each, directional hooks",group:"evolve"},
+  {id:18,label:"Testing Strategy",sub:"Marksman vs Sniper + launch priority",group:"evolve"},
+  {id:19,label:"EVOLVE Brief — Part 1",sub:"Research synthesis through avatar",group:"brief"},
+  {id:20,label:"EVOLVE Brief — Part 2",sub:"Angles, concepts & testing strategy",group:"brief"},
+  {id:21,label:"Copywriter Brief — Part 1",sub:"Audience, VOC & angles",group:"brief"},
+  {id:22,label:"Copywriter Brief — Part 2",sub:"15 concepts + execution guidelines",group:"brief"},
+];
+const GROUPS = [
+  {key:"voc",label:"VOC Research",color:"#7B9E87"},
+  {key:"intel",label:"Competitive Intel",color:"#C17A3C"},
+  {key:"evolve",label:"EVOLVE Framework",color:"#6B7FD7"},
+  {key:"brief",label:"Brief Assembly",color:"#9B7EC8"},
+];
+const FIELDS = [
+  {k:"brand",l:"Brand Name",r:true,p:"e.g. Cellics",rows:1},
+  {k:"product",l:"Product Name",r:true,p:"e.g. Swiss Apple Stem Cell Drops",rows:1},
+  {k:"price",l:"Price Point",r:false,p:"e.g. $79 / $149 for 3-pack",rows:1},
+  {k:"mechanism",l:"How It Works",r:true,p:"Plain English: 'The X does Y, which causes Z, so the customer gets...'",rows:3},
+  {k:"audience",l:"Target Audience",r:true,p:"e.g. Men 35–60 who tried TRT, boosters, Shilajit — no lasting results",rows:2},
+  {k:"testedAngles",l:"Angles Already Tested",r:false,p:"What's been run before and what happened?",rows:2},
+  {k:"competitors",l:"Competitors",r:false,p:"e.g. Primal Viking, Menerals, TestoPrime",rows:1},
+  {k:"month",l:"Month / Season",r:false,p:"e.g. March — for desire calendar alignment",rows:1},
+  {k:"mechanismOverride",l:"Known Mechanism (optional)",r:false,p:"Paste your product's specific mechanism",rows:2},
+  {k:"videoNotes",l:"Video Research Notes",r:false,p:"Paste manual TikTok/YouTube observations",rows:3},
+];
+
+let state = {
+  running:false, currentStep:-1, stepLabel:"",
+  context:{}, evolveBrief:"", copyBrief:"", htmlContent:"",
+  backendOnline:null, form:{}, activeTab:"evolve", aborted:false
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────
+function initFields() {
+  const c = document.getElementById("fields");
+  FIELDS.forEach(f => {
+    const w = document.createElement("div");
+    const lb = document.createElement("div"); lb.className = "lbl";
+    if (f.r) { const d = document.createElement("span"); d.className = "req"; lb.appendChild(d); }
+    lb.appendChild(document.createTextNode(f.l));
+    let el = f.rows===1 ? document.createElement("input") : document.createElement("textarea");
+    if (f.rows===1) el.type = "text"; else el.rows = f.rows;
+    el.className = "field"; el.placeholder = f.p; el.id = "f_"+f.k;
+    el.addEventListener("input", () => { state.form[f.k] = el.value; });
+    w.appendChild(lb); w.appendChild(el); c.appendChild(w);
+  });
+}
+
+function initSteps() {
+  const c = document.getElementById("steps");
+  GROUPS.forEach(g => {
+    const gl = document.createElement("div"); gl.className = "glbl"; gl.style.color = g.color; gl.textContent = g.label;
+    c.appendChild(gl);
+    STEPS.filter(s=>s.group===g.key).forEach(s => {
+      const row = document.createElement("div"); row.className = "srow"; row.id = "sr_"+s.id; row.style.opacity = "0.22";
+      const num = document.createElement("div"); num.className = "snum"; num.id = "sn_"+s.id;
+      num.style.background = "#EDE9E2"; num.style.color = "#9E998F"; num.textContent = s.id+1;
+      const info = document.createElement("div"); info.style.flex = "1";
+      const sl = document.createElement("div"); sl.className = "slbl"; sl.id = "sl_"+s.id; sl.style.color = "#8A8480"; sl.textContent = s.label;
+      const ss = document.createElement("div"); ss.className = "ssub"; ss.textContent = s.sub;
+      info.appendChild(sl); info.appendChild(ss);
+      row.appendChild(num); row.appendChild(info); c.appendChild(row);
+    });
+  });
+}
+
+function updateSteps() {
+  const cs = state.currentStep;
+  STEPS.forEach(s => {
+    const row = document.getElementById("sr_"+s.id);
+    const num = document.getElementById("sn_"+s.id);
+    const lbl = document.getElementById("sl_"+s.id);
+    if (!row) return;
+    const g = GROUPS.find(g=>g.key===s.group);
+    const done = cs > s.id, active = cs === s.id;
+    row.style.opacity = done?"0.6":active?"1":cs<0?"0.35":"0.22";
+    num.style.background = active?g.color:done?"#1A1814":"#EDE9E2";
+    num.style.color = (active||done)?"#fff":"#9E998F";
+    num.style.animation = active?"pr 1.4s ease-in-out infinite":"none";
+    num.textContent = done?"✓":s.id+1;
+    lbl.style.fontWeight = active?"600":"400";
+    lbl.style.color = active?"#1A1814":done?"#555":"#8A8480";
+  });
+}
+
+function checkBackend() {
+  fetch(BACKEND+"/health")
+    .then(r => { state.backendOnline = r.ok; updateStatus(); })
+    .catch(() => { state.backendOnline = false; updateStatus(); });
+}
+
+function updateStatus() {
+  const dot = document.getElementById("sdot");
+  const txt = document.getElementById("stxt");
+  const warn = document.getElementById("owarn");
+  const online = state.backendOnline;
+  dot.className = "sdot "+(online===true?"son":online===false?"soff":"schk");
+  txt.className = "stxt "+(online===true?"son-t":online===false?"soff-t":"schk-t");
+  txt.textContent = online===true?"Backend online":online===false?"Backend offline":"Checking…";
+  warn.style.display = online===false?"block":"none";
+  if (!state.running) document.getElementById("runbtn").disabled = online===false;
+}
+
+// ── Pipeline ───────────────────────────────────────────────────────────────
+async function runPipeline() {
+  const form = {};
+  FIELDS.forEach(f => { form[f.k] = document.getElementById("f_"+f.k).value; });
+  state.form = form;
+
+  if (!form.brand||!form.product||!form.mechanism||!form.audience) {
+    showErr("Brand, Product, Mechanism, and Audience are required."); return;
+  }
+  if (!state.backendOnline) { showErr("Backend offline."); return; }
+
+  state.running = true; state.aborted = false;
+  state.currentStep = 0; state.context = {};
+  state.evolveBrief = ""; state.copyBrief = ""; state.htmlContent = "";
+  hideErr();
+
+  document.getElementById("runbtn").disabled = true;
+  document.getElementById("runbtn").innerHTML = '<div class="spinner"></div> Running 23-Step Pipeline…';
+  document.getElementById("emptystate").style.display = "none";
+  document.getElementById("livepanel").style.display = "block";
+  document.getElementById("outpanel").style.display = "none";
+  document.getElementById("ptxt").style.display = "flex";
+  document.getElementById("pbar").style.display = "block";
+  document.getElementById("pinfo").style.display = "block";
+  document.getElementById("pdone").style.display = "none";
+  document.getElementById("dntxt").style.display = "none";
+  document.getElementById("livecards").innerHTML = "";
+  updateSteps();
+
+  try {
+    for (let stepId = 0; stepId < 23; stepId++) {
+      if (state.aborted) break;
+
+      state.currentStep = stepId;
+      const s = STEPS[stepId];
+      const g = GROUPS.find(g=>g.key===s.group);
+      const pct = Math.round((stepId/23)*100);
+
+      document.getElementById("livelbl").textContent = `Step ${stepId+1} of 23: ${s.label}`;
+      document.getElementById("ppct").textContent = pct+"%";
+      document.getElementById("pbarfill").style.width = pct+"%";
+      document.getElementById("pinfo").textContent = pct+"% — "+s.label;
+      updateSteps();
+
+      const resp = await fetch(BACKEND+"/api/step", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ stepId, form: state.form, context: state.context })
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(()=>({}));
+        throw new Error(errData.error || `Step ${stepId} failed: HTTP ${resp.status}`);
+      }
+
+      const result = await resp.json();
+      state.context[stepId] = result.data;
+
+      // Add live card
+      const card = document.createElement("div"); card.className = "lcard";
+      card.innerHTML = `<div class="lclbl" style="color:${g.color}">✓ ${esc(s.label)}</div><div class="lcbody">${esc((result.data||"").substring(0,300))}</div>`;
+      document.getElementById("livecards").appendChild(card);
+
+      state.currentStep = stepId+1;
+      const pct2 = Math.round(((stepId+1)/23)*100);
+      document.getElementById("ppct").textContent = pct2+"%";
+      document.getElementById("pbarfill").style.width = pct2+"%";
+      updateSteps();
+    }
+
+    if (!state.aborted) {
+      // Assemble briefs
+      state.evolveBrief = (state.context[19]||"") + "\n\n" + (state.context[20]||"");
+      state.copyBrief = (state.context[21]||"") + "\n\n" + (state.context[22]||"");
+
+      document.getElementById("pbarfill").style.width = "100%";
+      document.getElementById("ppct").textContent = "100%";
+      document.getElementById("pbar").style.display = "none";
+      document.getElementById("pinfo").style.display = "none";
+      document.getElementById("pdone").style.display = "block";
+      document.getElementById("dntxt").style.display = "block";
+      document.getElementById("ptxt").style.display = "none";
+      buildHtml();
+      showOutput();
+    }
+
+  } catch(err) {
+    showErr("Pipeline error: " + (err.message||String(err)));
+  } finally {
+    state.running = false;
+    document.getElementById("runbtn").disabled = false;
+    document.getElementById("runbtn").innerHTML = '<span style="font-size:14px">▶</span> Run Full Pipeline';
+    document.getElementById("ptxt").style.display = "none";
+  }
+}
+
+function showOutput() {
+  const meta = state.form.brand+" · "+state.form.product+" · "+new Date().toLocaleDateString();
+  document.getElementById("evolvecontent").textContent = state.evolveBrief||"No output";
+  document.getElementById("copycontent").textContent = state.copyBrief||"No output";
+  document.getElementById("emeta").textContent = meta;
+  document.getElementById("cmeta").textContent = meta;
+  buildLogPanel();
+  document.getElementById("livepanel").style.display = "none";
+  document.getElementById("outpanel").style.display = "block";
+  document.getElementById("main").scrollTop = 0;
+}
+
+function buildLogPanel() {
+  const c = document.getElementById("logcontent"); c.innerHTML = "";
+  GROUPS.forEach(g => {
+    const gs = STEPS.filter(s=>s.group===g.key&&state.context[s.id]);
+    if (!gs.length) return;
+    const w = document.createElement("div"); w.className = "loggp";
+    w.innerHTML = `<div class="loggl" style="color:${g.color}">${g.label}</div>`;
+    gs.forEach(s => {
+      const st = document.createElement("div"); st.className = "logst";
+      st.innerHTML = `<div class="logsth"><div class="logstn">${s.id+1}</div><div style="flex:1"><span style="font-size:12.5px;font-weight:600">${esc(s.label)}</span><span style="font-size:10px;color:#AEA9A0;margin-left:8px">${esc(s.sub)}</span></div><button class="cpbtn" onclick="copyStep(${s.id},this)">Copy</button></div><div class="logstb">${esc(state.context[s.id]||"")}</div>`;
+      w.appendChild(st);
+    });
+    c.appendChild(w);
+  });
+}
+
+function buildHtml() {
+  const e = s=>(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const f = state.form;
+  const logHtml = STEPS.map(s => {
+    if (!state.context[s.id]) return "";
+    return `<div style="margin-bottom:32px"><div style="font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#C17A3C;margin-bottom:8px;font-weight:600">${e(s.label)}</div><pre style="font-family:monospace;font-size:12px;line-height:1.85;white-space:pre-wrap;word-break:break-word;background:#F0EDE6;border-left:4px solid #C17A3C;padding:20px 24px;color:#1A1814;margin:0">${e(state.context[s.id])}</pre></div>`;
+  }).join("");
+  state.htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>EVOLVE Brief — ${e(f.brand)}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#FAF8F4;color:#1A1814;line-height:1.75;font-size:14px}.cover{background:#1A1814;color:#FAF8F4;padding:72px 64px}.cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#C17A3C;margin-bottom:16px;font-family:monospace}.ct{font-size:52px;line-height:1.1;margin-bottom:8px}.cs{font-size:52px;font-style:italic;color:#C17A3C;border-bottom:3px solid #C17A3C;padding-bottom:24px;margin-bottom:40px}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px}.meta label{font-family:monospace;font-size:10px;letter-spacing:.12em;color:#9A9490;text-transform:uppercase;display:block;margin-bottom:6px}.meta span{font-size:15px}.body{max-width:900px;margin:0 auto;padding:64px 48px}.sec{margin-bottom:64px}.secl{font-family:monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#C17A3C;margin-bottom:8px}.sech{font-size:28px;font-weight:600;border-bottom:3px solid #C17A3C;padding-bottom:12px;margin-bottom:24px}pre.main{font-family:monospace;font-size:12px;line-height:1.85;white-space:pre-wrap;word-break:break-word;background:#F0EDE6;border-left:4px solid #C17A3C;padding:20px 24px;color:#1A1814}.div{height:1px;background:linear-gradient(to right,#C17A3C,#E2DDD6 60%,transparent);margin:48px 0}.footer{text-align:center;padding:40px;font-family:monospace;font-size:11px;color:#B0AA9E;border-top:1px solid #E2DDD6;margin-top:64px}</style></head><body><div class="cover"><div class="cl">EVOLVE · Creative Strategy Framework</div><div class="ct">Research &amp;</div><div class="cs">Creative Brief</div><div class="meta"><div><label>Brand / Product</label><span>${e(f.brand)} — ${e(f.product)}</span></div><div><label>Price</label><span>${e(f.price)||"—"}</span></div><div><label>Date</label><span>${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</span></div><div><label>Season</label><span>${e(f.month)||"—"}</span></div><div><label>Competitors</label><span>${e(f.competitors)||"—"}</span></div><div><label>Pipeline</label><span>23 steps · Brave + Puppeteer + Claude</span></div></div></div><div class="body"><div class="sec"><div class="secl">SECTION 01</div><h2 class="sech">EVOLVE Framework Brief</h2><pre class="main">${e(state.evolveBrief)}</pre></div><div class="div"></div><div class="sec"><div class="secl">SECTION 02</div><h2 class="sech">Copywriter Brief</h2><pre class="main">${e(state.copyBrief)}</pre></div><div class="div"></div><div class="sec"><div class="secl">APPENDIX</div><h2 class="sech">Full Research Log</h2>${logHtml}</div></div><div class="footer">EVOLVE Creative Strategy · ${e(f.brand)} · ${new Date().toLocaleDateString()} · Confidential</div></body></html>`;
+}
+
+function switchTab(tab) {
+  state.activeTab = tab;
+  const tabs = ["evolve","copy","log"];
+  document.querySelectorAll(".tab").forEach((btn,i) => btn.classList.toggle("active", tabs[i]===tab));
+  document.getElementById("tabevolve").style.display = tab==="evolve"?"block":"none";
+  document.getElementById("tabcopy").style.display = tab==="copy"?"block":"none";
+  document.getElementById("tablog").style.display = tab==="log"?"block":"none";
+}
+
+function copyText(which) {
+  let text="", btnId="";
+  if (which==="evolve"){text=state.evolveBrief;btnId="cpevolve";}
+  else if (which==="copy"){text=state.copyBrief;btnId="cpcopy";}
+  else if (which==="all"){
+    text=STEPS.map(s=>state.context[s.id]?`=== ${s.label.toUpperCase()} ===\n${state.context[s.id]}`:"").filter(Boolean).join("\n\n");
+    btnId="cpall";
+  }
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById(btnId);
+    btn.textContent="✓ Copied"; btn.classList.add("cok");
+    setTimeout(()=>{btn.textContent=which==="all"?"Copy All":"Copy";btn.classList.remove("cok");},2000);
+  });
+}
+
+function copyStep(id, btn) {
+  navigator.clipboard.writeText(state.context[id]||"").then(()=>{
+    btn.textContent="✓"; btn.classList.add("cok");
+    setTimeout(()=>{btn.textContent="Copy";btn.classList.remove("cok");},2000);
+  });
+}
+
+function downloadBrief() {
+  if (!state.htmlContent) return;
+  const blob = new Blob([state.htmlContent],{type:"text/html;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href=url;
+  a.download = "EVOLVE_Brief_"+(state.form.brand||"Brand").replace(/\s+/g,"_")+"_"+new Date().toISOString().slice(0,10)+".html";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function showErr(msg){const b=document.getElementById("errbox");b.textContent=msg;b.style.display="block";}
+function hideErr(){document.getElementById("errbox").style.display="none";}
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+initFields();
+initSteps();
+checkBackend();
+setInterval(checkBackend,30000);
+</script>
+</body>
+</html>
